@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Place Order | Blarark VI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cart-items-list { max-height: 300px; overflow-y: auto; margin-bottom: 1rem; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid var(--cream-transparent); gap: 0.5rem; flex-wrap: wrap; }
+        .cart-item-name { flex: 2; font-size: 0.85rem; min-width: 120px; }
+        .cart-item-price { font-size: 0.85rem; color: var(--gold); white-space: nowrap; }
+        .cart-item-qty { display: flex; align-items: center; gap: 0.5rem; }
+        .cart-qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+        .cart-remove-btn { background: transparent; border: none; color: #ff6b6b; cursor: pointer; font-size: 1rem; padding: 0.2rem 0.5rem; }
+        .cart-summary { padding-top: 1rem; border-top: 1px solid var(--gold); }
+        .cart-summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .cart-grand-total { font-size: 1.2rem; font-weight: bold; color: var(--gold); }
+        #cart-display { display: none; margin-bottom: 1.5rem; }
+        #cart-display.show { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay" style="background-image: url('https://i.ibb.co/jPtq0Dsh/IMG-20260415-WA0001.jpg');"></div>
+    <div class="bg-tint"></div>
+
+    <div class="page-container">
+        <a href="index.html" class="btn-back">← Back to Home</a>
+        
+        <div class="page-header">
+            <h1 class="page-title">Place Order</h1>
+        </div>
+
+        <div class="page-content">
+            <!-- Order Type Toggle -->
+            <div class="order-type-toggle">
+                <button class="order-type-btn active" onclick="setOrderType('dinein')">Dine In</button>
+                <button class="order-type-btn" onclick="setOrderType('delivery')">Delivery</button>
+            </div>
+
+            <!-- Dine In Form -->
+            <div id="dinein-form" class="order-form">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="dinein-name" placeholder="Enter your name" required></div>
+                <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-input" id="dinein-phone" placeholder="+234..." required></div>
+                <div class="form-group"><label class="form-label">Table Number</label><input type="text" class="form-input" id="dinein-table" placeholder="Table number" required></div>
+                <div class="form-group"><label class="form-label">Reservation Time</label><input type="time" class="form-input" id="dinein-time" required></div>
+            </div>
+
+            <!-- Delivery Form -->
+            <div id="delivery-form" class="order-form" style="display: none;">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="delivery-name" placeholder="Enter your name" required></div>
+                <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-input" id="delivery-phone" placeholder="+234..." required></div>
+                <div class="form-group"><label class="form-label">Delivery Address</label><input type="text" class="form-input" id="delivery-address" placeholder="Full delivery address" required></div>
+            </div>
+
+            <!-- Cart Display -->
+            <div id="cart-display">
+                <h3 class="menu-category-title" style="font-size: 1.1rem;">Your Order</h3>
+                <div id="cart-items-list" class="cart-items-list"></div>
+                <div id="cart-summary" class="cart-summary"></div>
+                <button class="submit-btn" onclick="proceedToCheckout()">Proceed to Checkout →</button>
+            </div>
+
+            <!-- Menu Categories -->
+            <div class="category-nav">
+                <button class="category-btn active" onclick="showCategory('bites')">Bites</button>
+                <button class="category-btn" onclick="showCategory('starters')">Starters</button>
+                <button class="category-btn" onclick="showCategory('grills')">Grills</button>
+                <button class="category-btn" onclick="showCategory('platters')">Platters</button>
+                <button class="category-btn" onclick="showCategory('soups')">Soups</button>
+                <button class="category-btn" onclick="showCategory('sides')">Sides</button>
+                <button class="category-btn" onclick="showCategory('seafood')">Seafood</button>
+                <button class="category-btn" onclick="showCategory('drinks')">Drinks</button>
+                <button class="category-btn" onclick="showCategory('cocktails')">Cocktails</button>
+                <button class="category-btn" onclick="showCategory('liquor')">Liquor</button>
+                <button class="category-btn" onclick="showCategory('wine')">Wine</button>
+                <button class="category-btn" onclick="showCategory('breakfast')">Breakfast</button>
+            </div>
+
+            <!-- BITES -->
+            <div id="bites" class="menu-section active">
+                <h2 class="menu-category-title">Drink Friendly Bites</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Lollipop</div></div><div class="menu-item-price">₦10,000</div><button class="add-btn" onclick="addToCart('Chicken Lollipop', 10000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Chicken Wings</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Peppered Chicken Wings', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Chicken Laps</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Peppered Chicken Laps', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Turkey</div></div><div class="menu-item-price">₦20,000</div><button class="add-btn" onclick="addToCart('Peppered Turkey', 20000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Goatmeat</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Peppered Goatmeat', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Gizzard</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Peppered Gizzard', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Catfish</div></div><div class="menu-item-price">₦16,000</div><button class="add-btn" onclick="addToCart('Peppered Catfish', 16000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Snails</div></div><div class="menu-item-price">₦16,000</div><button class="add-btn" onclick="addToCart('Peppered Snails', 16000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Pepper Soup</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Chicken Pepper Soup', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Catfish Pepper Soup</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Catfish Pepper Soup', 14000)">+</button></div>
+            </div>
+
+            <!-- STARTERS -->
+            <div id="starters" class="menu-section">
+                <h2 class="menu-category-title">Starters</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Shrimp or Chicken Spring Rolls</div></div><div class="menu-item-price">₦11,000</div><button class="add-btn" onclick="addToCart('Spring Rolls', 11000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Croquet</div></div><div class="menu-item-price">₦11,000</div><button class="add-btn" onclick="addToCart('Chicken Croquet', 11000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Popcorn</div></div><div class="menu-item-price">₦11,000</div><button class="add-btn" onclick="addToCart('Chicken Popcorn', 11000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Firecracker Prawns</div></div><div class="menu-item-price">₦18,000</div><button class="add-btn" onclick="addToCart('Firecracker Prawns', 18000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Asun</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Asun', 14000)">+</button></div>
+            </div>
+
+            <!-- GRILLS -->
+            <div id="grills" class="menu-section">
+                <h2 class="menu-category-title">Grills</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Rabbit</div></div><div class="menu-item-price">₦25,000</div><button class="add-btn" onclick="addToCart('Grilled Rabbit', 25000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Chicken BBQ</div></div><div class="menu-item-price">₦14,000</div><button class="add-btn" onclick="addToCart('Grilled Chicken BBQ', 14000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Grilled Jumbo Prawns</div></div><div class="menu-item-price">₦30,000</div><button class="add-btn" onclick="addToCart('BA Jumbo Prawns', 30000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Lobster</div></div><div class="menu-item-price">₦35,000</div><button class="add-btn" onclick="addToCart('Grilled Lobster', 35000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Barbecue Catfish</div></div><div class="menu-item-price">₦25,000</div><button class="add-btn" onclick="addToCart('Barbecue Catfish', 25000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Barbecue Croaker Fish</div></div><div class="menu-item-price">₦30,000</div><button class="add-btn" onclick="addToCart('Barbecue Croaker Fish', 30000)">+</button></div>
+            </div>
+
+            <!-- PLATTERS -->
+            <div id="platters" class="menu-section">
+                <h2 class="menu-category-title">Platters</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Platter</div><div class="menu-item-desc">Grilled Rabbit, Catfish, Chicken, Peppered Snails, Peppered Mutton, Prawns, BA Rice, Yam Fries</div></div><div class="menu-item-price">₦85,000</div><button class="add-btn" onclick="addToCart('BA Platter', 85000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Odogwu Platter</div><div class="menu-item-desc">Peppered Chicken Wings, Gizzard, Turkey, Croaker Fish, Roast Plantain, Yam Fries</div></div><div class="menu-item-price">₦70,000</div><button class="add-btn" onclick="addToCart('Odogwu Platter', 70000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Smoky Platter</div><div class="menu-item-desc">Grilled Chicken Laps, Catfish, Asun, Jollof Rice, Yam Fries</div></div><div class="menu-item-price">₦50,000</div><button class="add-btn" onclick="addToCart('Smoky Platter', 50000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Quickie Platter</div><div class="menu-item-desc">Peppered Chicken Wings, Chicken Drumstick, Chicken Spring Rolls</div></div><div class="menu-item-price">₦30,000</div><button class="add-btn" onclick="addToCart('Quickie Platter', 30000)">+</button></div>
+            </div>
+
+            <!-- SOUPS -->
+            <div id="soups" class="menu-section">
+                <h2 class="menu-category-title">Nigerian Soups</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blarark Fisherman Soup</div><div class="menu-item-desc">Snail, Prawns, Shrimps, Periwinkles, Wheels</div></div><div class="menu-item-price">₦20,000</div><button class="add-btn" onclick="addToCart('Fisherman Soup', 20000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Banga Soup</div></div><div class="menu-item-price">₦15,000</div><button class="add-btn" onclick="addToCart('Banga Soup', 15000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Seafood Banga Soup</div></div><div class="menu-item-price">₦20,000</div><button class="add-btn" onclick="addToCart('Seafood Banga Soup', 20000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Okro Soup</div></div><div class="menu-item-price">₦15,000</div><button class="add-btn" onclick="addToCart('Okro Soup', 15000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Seafood Okro Soup</div></div><div class="menu-item-price">₦20,000</div><button class="add-btn" onclick="addToCart('Seafood Okro Soup', 20000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Afang Soup</div></div><div class="menu-item-price">₦15,000</div><button class="add-btn" onclick="addToCart('Afang Soup', 15000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Edikan Ikong Soup</div></div><div class="menu-item-price">₦15,000</div><button class="add-btn" onclick="addToCart('Edikan Ikong Soup', 15000)">+</button></div>
+            </div>
+
+            <!-- SIDES -->
+            <div id="sides" class="menu-section">
+                <h2 class="menu-category-title">Sides</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">White Rice</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('White Rice', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jollof Rice</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Jollof Rice', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Special Rice</div></div><div class="menu-item-price">₦5,000</div><button class="add-btn" onclick="addToCart('BA Special Rice', 5000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Irish Potato Fries</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Irish Fries', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Sweet Potato Fries</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Sweet Potato Fries', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Yam Fries</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Yam Fries', 3000)">+</button></div>
+            </div>
+
+            <!-- SEAFOOD BOIL -->
+            <div id="seafood" class="menu-section">
+                <h2 class="menu-category-title">Seafood Boil</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Small (2 persons)</div></div><div class="menu-item-price">₦35,000</div><button class="add-btn" onclick="addToCart('Seafood Boil Small', 35000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Medium (3-4 persons)</div></div><div class="menu-item-price">₦50,000</div><button class="add-btn" onclick="addToCart('Seafood Boil Medium', 50000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Large - Noah's Ark</div></div><div class="menu-item-price">₦65,000</div><button class="add-btn" onclick="addToCart('Seafood Boil Large', 65000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Extra Large (5-8 persons)</div></div><div class="menu-item-price">₦120,000</div><button class="add-btn" onclick="addToCart('Seafood Boil XL', 120000)">+</button></div>
+            </div>
+
+            <!-- DRINKS -->
+            <div id="drinks" class="menu-section">
+                <h2 class="menu-category-title">Drinks</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Water</div></div><div class="menu-item-price">₦1,000</div><button class="add-btn" onclick="addToCart('Water', 1000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Soft Drink</div></div><div class="menu-item-price">₦2,000</div><button class="add-btn" onclick="addToCart('Soft Drink', 2000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Malt Drink</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Malt Drink', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pack Fruit Juice</div></div><div class="menu-item-price">₦6,000</div><button class="add-btn" onclick="addToCart('Pack Fruit Juice', 6000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Fresh Juice</div></div><div class="menu-item-price">₦4,000</div><button class="add-btn" onclick="addToCart('Fresh Juice', 4000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Energy Drink</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Energy Drink', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Beer</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Beer', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Palmwine Cup</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Palmwine Cup', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Palmwine Jug</div></div><div class="menu-item-price">₦10,000</div><button class="add-btn" onclick="addToCart('Palmwine Jug', 10000)">+</button></div>
+            </div>
+
+            <!-- COCKTAILS -->
+            <div id="cocktails" class="menu-section">
+                <h2 class="menu-category-title">Cocktails</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blue Hawaiian</div></div><div class="menu-item-price">₦8,500</div><button class="add-btn" onclick="addToCart('Blue Hawaiian', 8500)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bounty Hunter</div></div><div class="menu-item-price">₦8,500</div><button class="add-btn" onclick="addToCart('Bounty Hunter', 8500)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blarark Zombie</div></div><div class="menu-item-price">₦10,000</div><button class="add-btn" onclick="addToCart('Blarark Zombie', 10000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Sweet Sensation</div></div><div class="menu-item-price">₦8,500</div><button class="add-btn" onclick="addToCart('Sweet Sensation', 8500)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bloody Ark</div></div><div class="menu-item-price">₦22,000</div><button class="add-btn" onclick="addToCart('Bloody Ark', 22000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grand Master</div></div><div class="menu-item-price">₦22,000</div><button class="add-btn" onclick="addToCart('Grand Master', 22000)">+</button></div>
+            </div>
+
+            <!-- LIQUOR -->
+            <div id="liquor" class="menu-section">
+                <h2 class="menu-category-title">Liquor</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Hennessey VS</div></div><div class="menu-item-price">₦120,000</div><button class="add-btn" onclick="addToCart('Hennessey VS', 120000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Hennessey VSOP</div></div><div class="menu-item-price">₦200,000</div><button class="add-btn" onclick="addToCart('Hennessey VSOP', 200000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jack Daniels</div></div><div class="menu-item-price">₦50,000</div><button class="add-btn" onclick="addToCart('Jack Daniels', 50000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">JW Red Label</div></div><div class="menu-item-price">₦60,000</div><button class="add-btn" onclick="addToCart('JW Red Label', 60000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">JW Black Label</div></div><div class="menu-item-price">₦100,000</div><button class="add-btn" onclick="addToCart('JW Black Label', 100000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jameson Green</div></div><div class="menu-item-price">₦60,000</div><button class="add-btn" onclick="addToCart('Jameson Green', 60000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jameson Black</div></div><div class="menu-item-price">₦100,000</div><button class="add-btn" onclick="addToCart('Jameson Black', 100000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Glenfiddich 12</div></div><div class="menu-item-price">₦140,000</div><button class="add-btn" onclick="addToCart('Glenfiddich 12', 140000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Macallan 12</div></div><div class="menu-item-price">₦200,000</div><button class="add-btn" onclick="addToCart('Macallan 12', 200000)">+</button></div>
+            </div>
+
+            <!-- WINE -->
+            <div id="wine" class="menu-section">
+                <h2 class="menu-category-title">Wines & Champagne</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Lamothe Parrot Red Wine</div></div><div class="menu-item-price">₦16,000</div><button class="add-btn" onclick="addToCart('Lamothe Parrot', 16000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Mouton Cadet</div></div><div class="menu-item-price">₦30,000</div><button class="add-btn" onclick="addToCart('Mouton Cadet', 30000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Moet Imperial Brut</div></div><div class="menu-item-price">₦250,000</div><button class="add-btn" onclick="addToCart('Moet Imperial Brut', 250000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Dom Perignon</div></div><div class="menu-item-price">₦950,000</div><button class="add-btn" onclick="addToCart('Dom Perignon', 950000)">+</button></div>
+            </div>
+
+            <!-- BREAKFAST -->
+            <div id="breakfast" class="menu-section">
+                <h2 class="menu-category-title">Breakfast</h2>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Champions Breakfast</div><div class="menu-item-desc">2 eggs, sausages, bacon, baked beans, toast, fried potatoes, juice or coffee</div></div><div class="menu-item-price">₦18,000</div><button class="add-btn" onclick="addToCart('BA Champions Breakfast', 18000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 1</div><div class="menu-item-desc">Rice and beans with dodo and stew</div></div><div class="menu-item-price">₦12,500</div><button class="add-btn" onclick="addToCart('Nigerian Breakfast 1', 12500)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 2</div><div class="menu-item-desc">Boiled yam and plantain with vegetable sauce</div></div><div class="menu-item-price">₦12,500</div><button class="add-btn" onclick="addToCart('Nigerian Breakfast 2', 12500)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Coffee</div></div><div class="menu-item-price">₦3,000</div><button class="add-btn" onclick="addToCart('Coffee', 3000)">+</button></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Tea</div></div><div class="menu-item-price">₦1,500</div><button class="add-btn" onclick="addToCart('Tea', 1500)">+</button></div>
+            </div>
+        </div>
+
+        <!-- Cart Bar -->
+        <div id="cart-bar" class="cart-bar">
+            <div><span class="cart-text">Your Order</span><span id="cart-count" class="cart-count"></span></div>
+            <div><span id="cart-total" class="cart-total">₦0</span><button class="checkout-btn" onclick="toggleCart()">View Cart</button></div>
+        </div>
+    </div>
+
+    <script>
+        // Cart State
+        let cart = [];
+        const WHATSAPP_NUMBER = '2349081560000';
+
+        function loadCart() {
+            const saved = localStorage.getItem('blarark_cart');
+            if (saved) cart = JSON.parse(saved);
+            updateCartUI();
+        }
+
+        function saveCart() {
+            localStorage.setItem('blarark_cart', JSON.stringify(cart));
+        }
+
+        function addToCart(name, price) {
+            const existing = cart.find(item => item.name === name);
+            if (existing) existing.quantity++;
+            else cart.push({ name, price, quantity: 1 });
+            saveCart();
+            updateCartUI();
+            const btn = event.target;
+            btn.style.background = '#D4AF37';
+            btn.style.color = '#0a0a0a';
+            setTimeout(() => {
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 300);
+        }
+
+        function updateCartUI() {
+            const cartBar = document.getElementById('cart-bar');
+            const cartTotal = document.getElementById('cart-total');
+            const cartCount = document.getElementById('cart-count');
+            const cartDisplay = document.getElementById('cart-display');
+            
+            if (!cartBar) return;
+            
+            if (cart.length === 0) {
+                cartBar.classList.remove('show');
+                if (cartDisplay) cartDisplay.classList.remove('show');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (cartTotal) cartTotal.textContent = '₦' + total.toLocaleString();
+            if (cartCount) cartCount.textContent = `(${itemCount})`;
+            cartBar.classList.add('show');
+            
+            renderCartDisplay();
+        }
+
+        function renderCartDisplay() {
+            const cartDisplay = document.getElementById('cart-display');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartSummary = document.getElementById('cart-summary');
+            
+            if (!cartDisplay || !cartItemsList) return;
+            
+            if (cart.length === 0) {
+                cartDisplay.classList.remove('show');
+                return;
+            }
+            
+            cartDisplay.classList.add('show');
+            
+            let itemsHtml = '';
+            let subtotal = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                itemsHtml += `
+                    <div class="cart-item-row">
+                        <span class="cart-item-name">${item.name}</span>
+                        <span class="cart-item-price">₦${item.price.toLocaleString()}</span>
+                        <div class="cart-item-qty">
+                            <button class="cart-qty-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="cart-qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        </div>
+                        <button class="cart-remove-btn" onclick="removeItem(${index})">🗑</button>
+                    </div>
+                `;
+            });
+            
+            cartItemsList.innerHTML = itemsHtml;
+            
+            cartSummary.innerHTML = `
+                <div class="cart-summary-row"><span>Subtotal:</span><span>₦${subtotal.toLocaleString()}</span></div>
+                <div class="cart-summary-row cart-grand-total"><span>Total:</span><span>₦${subtotal.toLocaleString()}</span></div>
+            `;
+        }
+
+        function updateQuantity(index, delta) {
+            if (cart[index]) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) cart.splice(index, 1);
+                saveCart();
+                updateCartUI();
+            }
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            saveCart();
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const cartDisplay = document.getElementById('cart-display');
+            if (cartDisplay) {
+                if (cartDisplay.classList.contains('show')) {
+                    cartDisplay.classList.remove('show');
+                } else {
+                    renderCartDisplay();
+                }
+            }
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+            
+            const isDineIn = document.querySelector('.order-type-btn.active')?.innerText === 'Dine In';
+            let message = 'Hello! I would like to place an order from Blarark VI:\n\n';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                message += `${item.quantity}x ${item.name} - ₦${itemTotal.toLocaleString()}\n`;
+            });
+            
+            message += `\nTotal: ₦${total.toLocaleString()}\n\n`;
+            
+            if (isDineIn) {
+                const name = document.getElementById('dinein-name')?.value || 'Not provided';
+                const phone = document.getElementById('dinein-phone')?.value || 'Not provided';
+                const table = document.getElementById('dinein-table')?.value || 'Not provided';
+                const time = document.getElementById('dinein-time')?.value || 'Not provided';
+                message += `Order Type: Dine In\nName: ${name}\nPhone: ${phone}\nTable: ${table}\nTime: ${time}`;
+            } else {
+                const name = document.getElementById('delivery-name')?.value || 'Not provided';
+                const phone = document.getElementById('delivery-phone')?.value || 'Not provided';
+                const address = document.getElementById('delivery-address')?.value || 'Not provided';
+                message += `Order Type: Delivery\nName: ${name}\nPhone: ${phone}\nAddress: ${address}`;
+            }
+            
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function setOrderType(type) {
+            const dineinForm = document.getElementById('dinein-form');
+            const deliveryForm = document.getElementById('delivery-form');
+            const btns = document.querySelectorAll('.order-type-btn');
+            
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            if (type === 'dinein') {
+                dineinForm.style.display = 'flex';
+                deliveryForm.style.display = 'none';
+                btns[0].classList.add('active');
+            } else {
+                dineinForm.style.display = 'none';
+                deliveryForm.style.display = 'flex';
+                btns[1].classList.add('active');
+            }
+        }
+
+        function showCategory(category) {
+            const btns = document.querySelectorAll('.category-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const sections = document.querySelectorAll('.menu-section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(category).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            const today = new Date().toISOString().split('T')[0];
+            dateInputs.forEach(input => input.min = today);
+        });
+    </script>
+</body>
+</html>
