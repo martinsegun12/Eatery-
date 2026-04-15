@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Table Reservation | Blarark VI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bg-overlay" style="background-image: url('https://i.ibb.co/jPtq0Dsh/IMG-20260415-WA0001.jpg');"></div>
+    <div class="bg-tint"></div>
+
+    <div class="page-container">
+        <a href="index.html" class="btn-back">← Back to Home</a>
+        
+        <div class="page-header">
+            <h1 class="page-title">Table Reservation</h1>
+            <p class="page-subtitle">Reserve your table for an unforgettable dining experience</p>
+        </div>
+
+        <div class="page-content">
+            <form class="reservation-form" onsubmit="handleReservation(event)">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="res-name" placeholder="Enter your full name" required></div>
+                <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-input" id="res-phone" placeholder="+234..." required></div>
+                <div class="form-group"><label class="form-label">Email (Optional)</label><input type="email" class="form-input" id="res-email" placeholder="your@email.com"></div>
+                <div class="form-group"><label class="form-label">Reservation Date</label><input type="date" class="form-input" id="res-date" required></div>
+                <div class="form-group"><label class="form-label">Reservation Time</label><select class="form-input" id="res-time" required><option value="">Select Time</option><option>12:00 PM</option><option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option><option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option><option>7:00 PM</option><option>8:00 PM</option><option>9:00 PM</option><option>10:00 PM</option><option>11:00 PM</option></select></div>
+                <div class="form-group"><label class="form-label">Number of Guests</label><input type="number" class="form-input" id="res-guests" placeholder="1-20 guests" min="1" max="20" required></div>
+                <div class="form-group"><label class="form-label">Special Requests (Optional)</label><input type="text" class="form-input" id="res-requests" placeholder="Birthday, anniversary, dietary restrictions, etc."></div>
+                <button type="submit" class="submit-btn">Request Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('res-date').min = new Date().toISOString().split('T')[0];
+        
+        function handleReservation(e) {
+            e.preventDefault();
+            const name = document.getElementById('res-name').value;
+            const phone = document.getElementById('res-phone').value;
+            const date = document.getElementById('res-date').value;
+            const time = document.getElementById('res-time').value;
+            const guests = document.getElementById('res-guests').value;
+            const requests = document.getElementById('res-requests').value || 'None';
+            
+            const message = `Hello! I would like to make a table reservation at Blarark VI.\n\nName: ${name}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests}\nSpecial Requests: ${requests}`;
+            window.open(`https://wa.me/2349081560000?text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
