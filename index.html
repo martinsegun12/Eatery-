@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blarark VI | Lagos Premier Restaurant & Lounge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --milk: #FFFDD0;
+            --milk-transparent: rgba(255, 253, 208, 0.1);
+            --overlay: rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--black);
+            font-family: 'Lato', sans-serif;
+            color: var(--milk);
+        }
+
+        /* Full Screen Sections */
+        .view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        /* Background Images with Overlay */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+        }
+
+        .bg-tint {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay);
+            z-index: -1;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        /* Home View Specific */
+        #home-view {
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .home-content {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .home-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .btn-milk {
+            background: transparent;
+            border: 2px solid var(--milk);
+            color: var(--milk);
+            padding: 1.2rem 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Lato', sans-serif;
+            font-weight: 400;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-milk::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--milk);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-milk:hover::before,
+        .btn-milk:active::before {
+            left: 0;
+        }
+
+        .btn-milk:hover,
+        .btn-milk:active {
+            color: var(--black);
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--milk);
+            color: var(--milk);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin: 1rem;
+            align-self: flex-start;
+            font-family: 'Lato', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Content Views */
+        .view-content {
+            padding: 0 1.5rem 2rem;
+            flex: 1;
+        }
+
+        .view-header {
+            padding: 2rem 1.5rem 1rem;
+        }
+
+        .view-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Menu Styles */
+        .category-nav {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid var(--milk-transparent);
+            z-index: 10;
+        }
+
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            background: transparent;
+            border: 1px solid var(--milk-transparent);
+            color: var(--milk);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            border-color: var(--milk);
+            background: var(--milk-transparent);
+        }
+
+        .menu-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .menu-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-category-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--milk-transparent);
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--milk-transparent);
+        }
+
+        .menu-item-info {
+            flex: 1;
+            padding-right: 1rem;
+        }
+
+        .menu-item-name {
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+
+        .menu-item-desc {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-weight: 300;
+            line-height: 1.4;
+        }
+
+        .menu-item-price {
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            margin-right: 1rem;
+            white-space: nowrap;
+        }
+
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--milk);
+            background: transparent;
+            color: var(--milk);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .add-btn:hover,
+        .add-btn:active {
+            background: var(--milk);
+            color: var(--black);
+        }
+
+        /* Cart Bar */
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--milk);
+            color: var(--black);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .cart-bar.show {
+            transform: translateY(0);
+        }
+
+        .cart-text {
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .cart-total {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+        }
+
+        .checkout-btn {
+            background: var(--black);
+            color: var(--milk);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* Table Reservation Form */
+        .reservation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .form-input {
+            background: transparent;
+            border: 1px solid var(--milk-transparent);
+            color: var(--milk);
+            padding: 1rem;
+            font-size: 0.9rem;
+            font-family: 'Lato', sans-serif;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--milk);
+        }
+
+        .submit-btn {
+            background: var(--milk);
+            color: var(--black);
+            border: none;
+            padding: 1.2rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            margin-top: 1rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* About & Location */
+        .info-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+
+        .location-details {
+            margin-top: 2rem;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--milk-transparent);
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--milk-transparent);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .view-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HOME VIEW -->
+    <section id="home-view" class="view active">
+        <div class="bg-overlay" style="background-image: url('https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=1600');"></div>
+        <div class="bg-tint"></div>
+        <div class="home-content">
+            <h1 class="logo">Blarark VI</h1>
+            <p class="tagline">Luxury Dining & Entertainment</p>
+            <div class="home-buttons">
+                <button class="btn-milk" onclick="showView('order-view')">Place Order</button>
+                <button class="btn-milk" onclick="showView('reservation-view')">Table Reservation</button>
+                <button class="btn-milk" onclick="showView('about-view')">About Us</button>
+                <button class="btn-milk" onclick="showView('location-view')">Location</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ORDER VIEW -->
+    <section id="order-view" class="view">
+        <div class="bg-overlay" style="background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600');"></div>
+        <div class="bg-tint"></div>
+        <button class="btn-back" onclick="showView('home-view')">← Back to Home</button>
+        
+        <div class="view-header">
+            <h2 class="view-title">Our Menu</h2>
+        </div>
+
+        <div class="category-nav">
+            <button class="category-btn active" onclick="showCategory('bites')">Bites</button>
+            <button class="category-btn" onclick="showCategory('starters')">Starters</button>
+            <button class="category-btn" onclick="showCategory('grills')">Grills</button>
+            <button class="category-btn" onclick="showCategory('platters')">Platters</button>
+            <button class="category-btn" onclick="showCategory('soups')">Soups</button>
+            <button class="category-btn" onclick="showCategory('sides')">Sides</button>
+            <button class="category-btn" onclick="showCategory('seafood')">Seafood Boil</button>
+            <button class="category-btn" onclick="showCategory('drinks')">Drinks</button>
+            <button class="category-btn" onclick="showCategory('cocktails')">Cocktails</button>
+            <button class="category-btn" onclick="showCategory('ogogoro')">Ogogoro</button>
+            <button class="category-btn" onclick="showCategory('mocktails')">Mocktails</button>
+            <button class="category-btn" onclick="showCategory('liquor')">Liquor</button>
+            <button class="category-btn" onclick="showCategory('wine')">Wine</button>
+            <button class="category-btn" onclick="showCategory('breakfast')">Breakfast</button>
+        </div>
+
+        <div class="view-content">
+            <!-- Drink Friendly Bites -->
+            <div id="bites" class="menu-section active">
+                <h3 class="menu-category-title">Drink Friendly Bites</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Lollipop</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦10,000</span><button class="add-btn" onclick="addToCart('Chicken Lollipop', 10000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Chicken Wings</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Peppered Chicken Wings', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Chicken Laps</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Peppered Chicken Laps', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Turkey</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Peppered Turkey', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Goatmeat</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Peppered Goatmeat', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Gizzard</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Peppered Gizzard', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Catfish</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦16,000</span><button class="add-btn" onclick="addToCart('Peppered Catfish', 16000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Peppered Snails</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦16,000</span><button class="add-btn" onclick="addToCart('Peppered Snails', 16000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Pepper Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Chicken Pepper Soup', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Catfish Pepper Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Catfish Pepper Soup', 14000)">+</button></div></div>
+            </div>
+
+            <!-- Starters -->
+            <div id="starters" class="menu-section">
+                <h3 class="menu-category-title">Starters</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Shrimp or Chicken Spring Rolls</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦11,000</span><button class="add-btn" onclick="addToCart('Shrimp or Chicken Spring Rolls', 11000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Croquet</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦11,000</span><button class="add-btn" onclick="addToCart('Chicken Croquet', 11000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chicken Popcorn</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦11,000</span><button class="add-btn" onclick="addToCart('Chicken Popcorn', 11000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Firecracker Prawns</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦18,000</span><button class="add-btn" onclick="addToCart('Firecracker Prawns', 18000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Asun (Spicy Smoked Goatmeat)</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Asun', 14000)">+</button></div></div>
+            </div>
+
+            <!-- Grills -->
+            <div id="grills" class="menu-section">
+                <h3 class="menu-category-title">Grills</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Rabbit</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦25,000</span><button class="add-btn" onclick="addToCart('Grilled Rabbit', 25000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Chicken in Barbecue Sauce</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦14,000</span><button class="add-btn" onclick="addToCart('Grilled Chicken in Barbecue Sauce', 14000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Grilled Jumbo Prawns</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦30,000</span><button class="add-btn" onclick="addToCart('BA Grilled Jumbo Prawns', 30000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grilled Lobster</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦35,000</span><button class="add-btn" onclick="addToCart('Grilled Lobster', 35000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Barbecue Catfish</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦25,000</span><button class="add-btn" onclick="addToCart('Barbecue Catfish', 25000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Barbecue Croaker Fish</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦30,000</span><button class="add-btn" onclick="addToCart('Barbecue Croaker Fish', 30000)">+</button></div></div>
+            </div>
+
+            <!-- Platters -->
+            <div id="platters" class="menu-section">
+                <h3 class="menu-category-title">Platters</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Platter</div><div class="menu-item-desc">Grilled Rabbit, Catfish, Chicken, Peppered Snails, Peppered Mutton, Prawns, BA Rice, Yam Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦85,000</span><button class="add-btn" onclick="addToCart('BA Platter', 85000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Odogwu Platter</div><div class="menu-item-desc">Peppered Chicken Wings, Gizzard, Turkey, Croaker Fish, Roast Plantain (Bole), Yam Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦70,000</span><button class="add-btn" onclick="addToCart('Odogwu Platter', 70000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Smoky Platter</div><div class="menu-item-desc">Grilled Chicken Laps, Catfish, Asun, Jollof Rice, Yam Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦50,000</span><button class="add-btn" onclick="addToCart('Smoky Platter', 50000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Quickie Platter</div><div class="menu-item-desc">Peppered Chicken Wings, Chicken Drumstick, Chicken Spring Rolls</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦30,000</span><button class="add-btn" onclick="addToCart('Quickie Platter', 30000)">+</button></div></div>
+            </div>
+
+            <!-- Nigerian Soups -->
+            <div id="soups" class="menu-section">
+                <h3 class="menu-category-title">Nigerian Soups</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blarark Fisherman Soup</div><div class="menu-item-desc">Snail, Prawns, Shrimps, Periwinkles, Wheels</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Blarark Fisherman Soup', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Banga Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦15,000</span><button class="add-btn" onclick="addToCart('Banga Soup', 15000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Seafood Banga Soup</div><div class="menu-item-desc">Snail, Prawns, Shrimps, Periwinkles</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Seafood Banga Soup', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Okro Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦15,000</span><button class="add-btn" onclick="addToCart('Okro Soup', 15000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Seafood Okro Soup</div><div class="menu-item-desc">Snail, Prawns, Shrimps, Periwinkles</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Seafood Okro Soup', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Afang Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦15,000</span><button class="add-btn" onclick="addToCart('Afang Soup', 15000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Edikan Ikong Soup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦15,000</span><button class="add-btn" onclick="addToCart('Edikan Ikong Soup', 15000)">+</button></div></div>
+            </div>
+
+            <!-- Sides -->
+            <div id="sides" class="menu-section">
+                <h3 class="menu-category-title">Sides</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">White Rice</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('White Rice', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jollof Rice</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Jollof Rice', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Special Rice</div><div class="menu-item-desc">Stir fry chicken bits, vegetables</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦5,000</span><button class="add-btn" onclick="addToCart('BA Special Rice', 5000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Irish Potato Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Irish Potato Fries', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Sweet Potato Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Sweet Potato Fries', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Yam Fries</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Yam Fries', 3000)">+</button></div></div>
+            </div>
+
+            <!-- Seafood Boil -->
+            <div id="seafood" class="menu-section">
+                <h3 class="menu-category-title">Seafood Boil</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Small (2 persons)</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦35,000</span><button class="add-btn" onclick="addToCart('Seafood Boil Small', 35000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Medium (3-4 persons)</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦50,000</span><button class="add-btn" onclick="addToCart('Seafood Boil Medium', 50000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Large - Noah's Ark (4-6 persons)</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦65,000</span><button class="add-btn" onclick="addToCart('Seafood Boil Large', 65000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Extra Large (5-8 persons)</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦120,000</span><button class="add-btn" onclick="addToCart('Seafood Boil Extra Large', 120000)">+</button></div></div>
+            </div>
+
+            <!-- Drinks -->
+            <div id="drinks" class="menu-section">
+                <h3 class="menu-category-title">Drinks</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Water</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦1,000</span><button class="add-btn" onclick="addToCart('Water', 1000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Coke, Fanta, Sprite, Tonic, Bitter Lemon</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦2,000</span><button class="add-btn" onclick="addToCart('Soft Drink', 2000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Malt Drink</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Malt Drink', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pack Fruit Juice</div><div class="menu-item-desc">Orange, Pineapple, Apple</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦6,000</span><button class="add-btn" onclick="addToCart('Pack Fruit Juice', 6000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Freshly Squeezed Fruit Juice</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦4,000</span><button class="add-btn" onclick="addToCart('Freshly Squeezed Fruit Juice', 4000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Energy Drink</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Energy Drink', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Your choice of any beer</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Beer', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Palmwine Cup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Palmwine Cup', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Palmwine Jug</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦10,000</span><button class="add-btn" onclick="addToCart('Palmwine Jug', 10000)">+</button></div></div>
+            </div>
+
+            <!-- Cocktails -->
+            <div id="cocktails" class="menu-section">
+                <h3 class="menu-category-title">Cocktails</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blue Hawaiian</div><div class="menu-item-desc">Rum, Coconut, Pineapple, Blue Curaçao</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Blue Hawaiian', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bounty Hunter</div><div class="menu-item-desc">Rum mix, Grenadine, Seltzer</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Bounty Hunter', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Blarark Zombie</div><div class="menu-item-desc">Rum mix, Fruit Mix, Lemon mix, Bitters</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦10,000</span><button class="add-btn" onclick="addToCart('Blarark Zombie', 10000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Sweet Sensation</div><div class="menu-item-desc">Palmwine, Fruit juice, Fruit Syrup</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Sweet Sensation', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bloody Ark</div><div class="menu-item-desc">Tomato juice, Vodka with Chicken Slider, Prawns & Bacon</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦22,000</span><button class="add-btn" onclick="addToCart('Bloody Ark', 22000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Grand Master</div><div class="menu-item-desc">Stout based Cocktail with Beef Slider, Prawns & Bacon</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦22,000</span><button class="add-btn" onclick="addToCart('Grand Master', 22000)">+</button></div></div>
+            </div>
+
+            <!-- Ogogoro -->
+            <div id="ogogoro" class="menu-section">
+                <h3 class="menu-category-title">Ogogoro</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Hustle</div><div class="menu-item-desc">Pedros Ogogoro, Bitters, Lime, Ginger Beer</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Nigerian Hustle', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Sapelo Sour</div><div class="menu-item-desc">Pedros Ogogoro, Lemon mix, Grenadine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Sapelo Sour', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pedros Bomb</div><div class="menu-item-desc">Beer with Pedros Ogogoro bomb</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦6,000</span><button class="add-btn" onclick="addToCart('Pedros Bomb', 6000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Mamiwater (shot)</div><div class="menu-item-desc">Pedros Ogogoro, Kalua, Blue Curaçao</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Mamiwater', 3000)">+</button></div></div>
+            </div>
+
+            <!-- Mocktails -->
+            <div id="mocktails" class="menu-section">
+                <h3 class="menu-category-title">Mocktails & Milkshakes</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Cinderella</div><div class="menu-item-desc">Pineapple Juice, Orange Juice, Bitters, Passion Fruit</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦5,500</span><button class="add-btn" onclick="addToCart('Cinderella', 5500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Virgin Colada</div><div class="menu-item-desc">Coconut milk, Pineapple</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦7,000</span><button class="add-btn" onclick="addToCart('Virgin Colada', 7000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Classic Mocktail</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦6,000</span><button class="add-btn" onclick="addToCart('Classic Mocktail', 6000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Special Personalised Mocktail</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦6,000</span><button class="add-btn" onclick="addToCart('Special Personalised Mocktail', 6000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Milkshake</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Milkshake', 8500)">+</button></div></div>
+            </div>
+
+            <!-- Liquor -->
+            <div id="liquor" class="menu-section">
+                <h3 class="menu-category-title">Liquor</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Hennessey VS</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦120,000</span><button class="add-btn" onclick="addToCart('Hennessey VS', 120000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Hennessey VSOP</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦200,000</span><button class="add-btn" onclick="addToCart('Hennessey VSOP', 200000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Hennessey XO</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦650,000</span><button class="add-btn" onclick="addToCart('Hennessey XO', 650000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jack Daniels</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦50,000</span><button class="add-btn" onclick="addToCart('Jack Daniels', 50000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">JW Red Label</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦60,000</span><button class="add-btn" onclick="addToCart('JW Red Label', 60000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">JW Black Label</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦100,000</span><button class="add-btn" onclick="addToCart('JW Black Label', 100000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jameson Green</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦60,000</span><button class="add-btn" onclick="addToCart('Jameson Green', 60000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Jameson Black</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦100,000</span><button class="add-btn" onclick="addToCart('Jameson Black', 100000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Glenfiddich 12</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦140,000</span><button class="add-btn" onclick="addToCart('Glenfiddich 12', 140000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Glenfiddich 15</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦180,000</span><button class="add-btn" onclick="addToCart('Glenfiddich 15', 180000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Macallan 12</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦200,000</span><button class="add-btn" onclick="addToCart('Macallan 12', 200000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bacardi White Rum</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦140,000</span><button class="add-btn" onclick="addToCart('Bacardi White Rum', 140000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pedros Ogogoro Classic</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦60,000</span><button class="add-btn" onclick="addToCart('Pedros Ogogoro Classic', 60000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pedros Ogogoro Red</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦100,000</span><button class="add-btn" onclick="addToCart('Pedros Ogogoro Red', 100000)">+</button></div></div>
+            </div>
+
+            <!-- Wines -->
+            <div id="wine" class="menu-section">
+                <h3 class="menu-category-title">Wines & Champagne</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Lamothe Parrot Red Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦16,000</span><button class="add-btn" onclick="addToCart('Lamothe Parrot Red Wine', 16000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Mouton Cadet</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦30,000</span><button class="add-btn" onclick="addToCart('Mouton Cadet', 30000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Escudo Rojo</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦45,000</span><button class="add-btn" onclick="addToCart('Escudo Rojo', 45000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Alba Sweet Red Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Alba Sweet Red Wine', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Alba Semi Sweet Red Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Alba Semi Sweet Red Wine', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Cote des roses</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦20,000</span><button class="add-btn" onclick="addToCart('Cote des roses', 20000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Declan White Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦16,000</span><button class="add-btn" onclick="addToCart('Declan White Wine', 16000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Martinelli Fruit Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦15,000</span><button class="add-btn" onclick="addToCart('Martinelli Fruit Wine', 15000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chamdor Fruit Wine</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦12,500</span><button class="add-btn" onclick="addToCart('Chamdor Fruit Wine', 12500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Moet Imperial Brut</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦250,000</span><button class="add-btn" onclick="addToCart('Moet Imperial Brut', 250000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Moet Imperial Rose</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦250,000</span><button class="add-btn" onclick="addToCart('Moet Imperial Rose', 250000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Dom Perignon Vintage Brut</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦950,000</span><button class="add-btn" onclick="addToCart('Dom Perignon Vintage Brut', 950000)">+</button></div></div>
+            </div>
+
+            <!-- Breakfast -->
+            <div id="breakfast" class="menu-section">
+                <h3 class="menu-category-title">Breakfast</h3>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">BA Champions Breakfast</div><div class="menu-item-desc">2 eggs, 2 sausages, 2 streaks of Bacon, Baked beans, Mushroom, 2 pcs of Toast bread, Fried Irish Potato, choice of Orange Juice or Coffee or Tea</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦18,000</span><button class="add-btn" onclick="addToCart('BA Champions Breakfast', 18000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 1</div><div class="menu-item-desc">White Rice and Beans with dodo, choice of Beef, Assorted Meat or Chicken Stew</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦12,500</span><button class="add-btn" onclick="addToCart('Nigerian Breakfast 1', 12500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 2</div><div class="menu-item-desc">Boiled Yam & Boiled Plantain with Ugu vegetable sauce, choice of Beef, Assorted Meat or Chicken</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦12,500</span><button class="add-btn" onclick="addToCart('Nigerian Breakfast 2', 12500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 3</div><div class="menu-item-desc">2 wraps of Moi-moi OR 6 pieces of Akara served with Custard, Cream & Sugar</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦5,000</span><button class="add-btn" onclick="addToCart('Nigerian Breakfast 3', 5000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Nigerian Breakfast 4</div><div class="menu-item-desc">Noodles & Vegetables Stirfry served with Omelette</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦5,000</span><button class="add-btn" onclick="addToCart('Nigerian Breakfast 4', 5000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Coffee</div><div class="menu-item-desc">Plain, Americano, Latte, Espresso</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Coffee', 3000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Iced Coffee</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦8,500</span><button class="add-btn" onclick="addToCart('Iced Coffee', 8500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Tea</div><div class="menu-item-desc">Plain black, Flavoured, Green Tea</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦1,500</span><button class="add-btn" onclick="addToCart('Tea', 1500)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Fresh Lemon Tea</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦2,000</span><button class="add-btn" onclick="addToCart('Fresh Lemon Tea', 2000)">+</button></div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Mixed Herbal Tea</div><div class="menu-item-desc">Lemon, Mint & Cloves</div></div><div style="display: flex; align-items: center;"><span class="menu-item-price">₦3,000</span><button class="add-btn" onclick="addToCart('Mixed Herbal Tea', 3000)">+</button></div></div>
+            </div>
+        </div>
+
+        <!-- Cart Bar -->
+        <div id="cart-bar" class="cart-bar">
+            <div>
+                <span class="cart-text">View Order</span>
+                <span id="cart-count" style="margin-left: 0.5rem; font-size: 0.75rem;"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="cart-total" class="cart-total">₦0</span>
+                <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TABLE RESERVATION VIEW -->
+    <section id="reservation-view" class="view">
+        <div class="bg-overlay" style="background-image: url('https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=1600');"></div>
+        <div class="bg-tint"></div>
+        <button class="btn-back" onclick="showView('home-view')">← Back to Home</button>
+        
+        <div class="view-header">
+            <h2 class="view-title">Table Reservation</h2>
+        </div>
+
+        <div class="view-content">
+            <p class="info-text">Reserve your table for an unforgettable dining experience at Blarark VI. Please fill out the form below and we will confirm your booking.</p>
+            
+            <form class="reservation-form" onsubmit="handleReservation(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" placeholder="+234..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email (Optional)</label>
+                    <input type="email" class="form-input" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reservation Date</label>
+                    <input type="date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reservation Time</label>
+                    <select class="form-input" style="background: var(--black);" required>
+                        <option value="">Select Time</option>
+                        <option>12:00 PM</option>
+                        <option>1:00 PM</option>
+                        <option>2:00 PM</option>
+                        <option>3:00 PM</option>
+                        <option>4:00 PM</option>
+                        <option>5:00 PM</option>
+                        <option>6:00 PM</option>
+                        <option>7:00 PM</option>
+                        <option>8:00 PM</option>
+                        <option>9:00 PM</option>
+                        <option>10:00 PM</option>
+                        <option>11:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Number of Guests</label>
+                    <input type="number" class="form-input" placeholder="1-20 guests" min="1" max="20" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Special Requests (Optional)</label>
+                    <input type="text" class="form-input" placeholder="Birthday, anniversary, dietary restrictions, etc.">
+                </div>
+                <button type="submit" class="submit-btn">Request Reservation</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ABOUT US VIEW -->
+    <section id="about-view" class="view">
+        <div class="bg-overlay" style="background-image: url('https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=1600');"></div>
+        <div class="bg-tint"></div>
+        <button class="btn-back" onclick="showView('home-view')">← Back to Home</button>
+        
+        <div class="view-header">
+            <h2 class="view-title">About Us</h2>
+        </div>
+
+        <div class="view-content">
+            <p class="info-text">
+                Blarark VI is Lagos' premier destination for luxury dining and entertainment. Located at 14 Adeola Hopewell, Victoria Island, we offer an escape into a world of refined taste and exceptional service.
+            </p>
+            <p class="info-text">
+                Our culinary team crafts dishes that celebrate both local Nigerian flavors and international cuisine, using only the finest ingredients. From our signature pepper soups to our carefully curated cocktail menu, every item is designed to delight.
+            </p>
+            <p class="info-text">
+                By night, Blarark VI transforms into a vibrant social hub, featuring live music, DJ sets, and exclusive events. Our VIP tables offer an intimate experience with premium bottle service, while our main lounge buzzes with energy.
+            </p>
+            <p class="info-text">
+                Whether you are joining us for a business lunch, celebrating a special occasion, or seeking the perfect night out, Blarark VI promises an experience beyond expectations.
+            </p>
+        </div>
+    </section>
+
+    <!-- LOCATION VIEW -->
+    <section id="location-view" class="view">
+        <div class="bg-overlay" style="background-image: url('https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=1600');"></div>
+        <div class="bg-tint"></div>
+        <button class="btn-back" onclick="showView('home-view')">← Back to Home</button>
+        
+        <div class="view-header">
+            <h2 class="view-title">Location</h2>
+        </div>
+
+        <div class="view-content">
+            <div class="location-details">
+                <div class="detail-row">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value">14 Adeola Hopewell, Victoria Island, Lagos, Nigeria</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hours</span>
+                    <span class="detail-value">Monday - Sunday: 11:00 AM - 2:00 AM<br>Breakfast: 7:00 AM - 11:00 AM</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Contact</span>
+                    <span class="detail-value">0908 156 0000<br>reservations@blararkvi.com</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Social Media</span>
+                    <span class="detail-value">@blarkark (Instagram, TikTok, Facebook, X)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Parking</span>
+                    <span class="detail-value">Complimentary valet parking available for all guests</span>
+                </div>
+            </div>
+
+            <button class="btn-milk" style="margin-top: 2rem; width: 100%;" onclick="window.open('https://maps.google.com?q=14+Adeola+Hopewell+Victoria+Island+Lagos', '_blank')">
+                Get Directions
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Cart State
+        let cart = [];
+        const WHATSAPP_NUMBER = '2349081560000';
+
+        // View Navigation
+        function showView(viewId) {
+            const views = document.querySelectorAll('.view');
+            views.forEach(view => {
+                view.classList.remove('active');
+                view.style.opacity = '0';
+            });
+
+            setTimeout(() => {
+                const targetView = document.getElementById(viewId);
+                targetView.classList.add('active');
+                void targetView.offsetWidth;
+                targetView.style.opacity = '1';
+                targetView.scrollTop = 0;
+            }, 50);
+        }
+
+        // Menu Category Navigation
+        function showCategory(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.menu-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(category).classList.add('active');
+        }
+
+        // Cart Functions
+        function addToCart(itemName, price) {
+            const existingItem = cart.find(item => item.name === itemName);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ name: itemName, price: price, quantity: 1 });
+            }
+            
+            updateCart();
+            
+            const btn = event.target;
+            btn.style.background = 'var(--milk)';
+            btn.style.color = 'var(--black)';
+            setTimeout(() => {
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 300);
+        }
+
+        function updateCart() {
+            const cartBar = document.getElementById('cart-bar');
+            const cartTotal = document.getElementById('cart-total');
+            const cartCount = document.getElementById('cart-count');
+            
+            if (cart.length === 0) {
+                cartBar.classList.remove('show');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            cartTotal.textContent = '₦' + total.toLocaleString();
+            cartCount.textContent = `(${itemCount} items)`;
+            cartBar.classList.add('show');
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            
+            let message = 'Hello! I would like to place an order from Blarark VI:\n\n';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                message += `${item.quantity}x ${item.name} - ₦${itemTotal.toLocaleString()}\n`;
+            });
+            
+            message += `\nTotal: ₦${total.toLocaleString()}`;
+            message += `\n\nPlease confirm my order.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+        }
+
+        // Table Reservation Handler
+        function handleReservation(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const name = e.target.querySelector('input[placeholder="Enter your full name"]').value;
+            const phone = e.target.querySelector('input[placeholder="+234..."]').value;
+            const date = e.target.querySelector('input[type="date"]').value;
+            const time = e.target.querySelector('select').value;
+            const guests = e.target.querySelector('input[placeholder="1-20 guests"]').value;
+            const requests = e.target.querySelector('input[placeholder="Birthday, anniversary, dietary restrictions, etc."]')?.value || 'None';
+            
+            const message = encodeURIComponent(
+                `Hello! I would like to make a table reservation at Blarark VI.\n\n` +
+                `Name: ${name}\n` +
+                `Phone: ${phone}\n` +
+                `Date: ${date}\n` +
+                `Time: ${time}\n` +
+                `Guests: ${guests}\n` +
+                `Special Requests: ${requests}`
+            );
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            const today = new Date().toISOString().split('T')[0];
+            dateInputs.forEach(input => input.min = today);
+        });
+    </script>
+</body>
+</html>
